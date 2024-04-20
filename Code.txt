@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
@@ -104,7 +106,7 @@ WebDriver driver;
 		Thread.sleep(5000);
 		driver.navigate().back();
 		Thread.sleep(2000);
-		driver.findElement(By.xpath("//input[@id='book-hotel-suggest-field']")).sendKeys("Downtown Dubai, Dubai, Dubai Emirate");
+		driver.findElement(By.xpath("//input[@id='book-hotel-suggest-field']")).sendKeys("downtown dubai");
 		String month="May 2024";
 		String date="20";
 		Thread.sleep(2000);
@@ -136,41 +138,44 @@ WebDriver driver;
 		driver.findElement(By.xpath("//td[@aria-label='Wednesday, May 22, 2024']//a[@class='CalendarDay__text__default'][normalize-space()='22']")).click();
 		Thread.sleep(2000);
 		driver.findElement(By.xpath("//button[@aria-label='Find hotels Opens an external link in a new tab']")).click();
+		Set<String> handles=driver.getWindowHandles();
+		Iterator it=handles.iterator();
+		String parentid=(String) it.next();
+		String childid=(String) it.next();
+		driver.switchTo().window(childid);
+		driver.findElement(By.xpath("//div[normalize-space()='Ramada Downtown Dubai']")).click();
 		
 		
+		 
    }
 	
 	@Test
 	public void test7()
 	{
-		 List<WebElement> links = driver.findElements(By.tagName("a"));
-	        for (WebElement link : links) {
-	            String url = link.getAttribute("href");
-	            if (url != null && !url.isEmpty()) 
-	            {
-	                try 
-	                {
-	                    HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-	                    connection.setConnectTimeout(3000);
-	                    connection.connect();
-	                    if (connection.getResponseCode() > 200) 
-	                    {
-	                        System.out.println(url + " - " + connection.getResponseMessage());
-	                    }
-	                    else
-	                    {
-	                    	System.out.println(url + " - " + connection.getResponseMessage() + "-" + "is a broken link");
-	                    }
-	                }
-	                  catch (Exception e) 
-	                   {
-	                    System.out.println( url + "-" + "is a broken link");
-	                   }
-	                  
-	            }
-	        }
-	        
-	}
+        
+        List<WebElement> links = driver.findElements(By.tagName("a"));
+        for (WebElement link : links)
+        {
+            String url = link.getAttribute("href");
+            if (url != null && !url.isEmpty())
+            {
+                try 
+                {
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(url).openConnection();
+                    httpURLConnection.setConnectTimeout(3000);
+                    httpURLConnection.connect();
+                    if (httpURLConnection.getResponseCode() != 200)
+                    {
+                        System.out.println( url + " - " + httpURLConnection.getResponseMessage() + "-" + "is a broken link");
+                    }
+                }
+                catch (Exception e)
+                {
+                	System.out.println( url + " - " +  "is a broken link");
+                }
+            }
+        }
+    }
 	
 	@AfterTest
 	public void aftertest()
@@ -179,6 +184,15 @@ WebDriver driver;
 	}
 	
 }
+
+
+	
+	
+	
+
+
+
+
 
 
 	
